@@ -10,6 +10,7 @@ class Package(models.Model):
     category       = models.ForeignKey('Category',on_delete=models.CASCADE)
     product        = models.ManyToManyField('Product',related_name='packages')
     tag            = models.ManyToManyField('Tag',related_name='packages')
+    
     class Meta:
         db_table = 'packages'
 
@@ -30,7 +31,7 @@ class Category(models.Model):
     class Meta:
         db_table = 'categories'
 
-class Package_image(models.Model):
+class PackageImage(models.Model):
     image_url = models.CharField(max_length=2000)
     packages  = models.ForeignKey('Package')
 
@@ -41,11 +42,13 @@ class Cart(models.Model):
     quantity  = models.IntegerField()
     package   = models.ForeignKey('Package',on_delete=models.CASCADE)
     user      = models.ForeignKey('User',on_delete=models.CASCADE)
+    created_at   = models.DateTimeField(auto_now_add=True)
+    updated_at   = models.DateTimeField(auto_add=True)
 
     class Meta:
         db_table = 'carts'
 
-class Order_item(models.Model):
+class OrderItem(models.Model):
     quantity   = models.IntegerField()
     package    = models.ForeignKey('Package',on_delete=models.CASCADE)
     order      = models.ForeignKey('Order',on_delete=models.CASCADE)
@@ -60,6 +63,8 @@ class Order(models.Model):
     status       = models.CharField(max_length=50)
     sub_total    = models.IntegerField()
     user         = models.ForeignKey('User',on_delete=models.CASCADE)
+    created_at   = models.DateTimeField(auto_now_add=True)
+    updated_at   = models.DateTimeField(auto_add=True)
 
     class Meta:
         db_table = 'orders'
@@ -67,7 +72,7 @@ class Order(models.Model):
 class User(models.Model):
     name     = models.CharField(max_length=50)
     address  = models.CharField(max_length=200)
-    email    = models.CharField(max_length=200)
+    email    = models.CharField(max_length=200,unique=True)
     password = models.CharField(max_length=200)
 
     class Meta:
@@ -78,17 +83,3 @@ class Tag(models.Model):
 
     class Meta:
         db_table = 'tags'
-
-# class PackageTag(models.Model):
-#     package = models.ForeignKey('Package',on_delete=models.CASCADE)
-#     tags = models.ForeignKey('Tag',on_delete=models.CASCADE)
-
-#     class Meta:
-#         db_table = 'package_tags'
-
-# class PackageProduct(models.Model):
-#     package = models.ManyToManyField('Package')
-#     product = models.ManyToManyField('Product')
-
-#     class Meta:
-#         db_table = 'package_products'
