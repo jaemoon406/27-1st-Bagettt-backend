@@ -1,15 +1,14 @@
-from django.db                  import models
+from django.db import models
 
-# Create your models here.
 class Package(models.Model):
     name           = models.CharField(max_length=100)
     description    = models.CharField(max_length=2000)
-    price          = models.CharField(max_length=50)
+    price          = models.DecimalField(max_digits=9,decimal_places=2)
     thumnail_image = models.CharField(max_length=2000)
-    sales_volume   = models.IntegerField()
+    sales_volume   = models.IntegerField(default=0)
     category       = models.ForeignKey('Category',on_delete=models.CASCADE)
-    product        = models.ManyToManyField('Product',related_name='packages')
-    tag            = models.ManyToManyField('Tag',related_name='packages')
+    products       = models.ManyToManyField('Product',related_name='packages')
+    tags           = models.ManyToManyField('Tag',related_name='packages')
     
     class Meta:
         db_table = 'packages'
@@ -39,9 +38,9 @@ class PackageImage(models.Model):
         db_table = 'package_images'
 
 class Cart(models.Model):
-    quantity  = models.IntegerField()
-    package   = models.ForeignKey('Package',on_delete=models.CASCADE)
-    user      = models.ForeignKey('User',on_delete=models.CASCADE)
+    quantity     = models.IntegerField()
+    package      = models.ForeignKey('Package',on_delete=models.CASCADE)
+    user         = models.ForeignKey('User',on_delete=models.CASCADE)
     created_at   = models.DateTimeField(auto_now_add=True)
     updated_at   = models.DateTimeField(auto_add=True)
 
@@ -52,15 +51,13 @@ class OrderItem(models.Model):
     quantity   = models.IntegerField()
     package    = models.ForeignKey('Package',on_delete=models.CASCADE)
     order      = models.ForeignKey('Order',on_delete=models.CASCADE)
-    user       = models.ForeignKey('User',on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'order_items'
 
 class Order(models.Model):
-    order_number = models.CharField(max_length=100) # uuidField 
-    status       = models.CharField(max_length=50)
+    order_number = models.CharField(max_length=100)
     sub_total    = models.IntegerField()
     user         = models.ForeignKey('User',on_delete=models.CASCADE)
     created_at   = models.DateTimeField(auto_now_add=True)
@@ -83,3 +80,10 @@ class Tag(models.Model):
 
     class Meta:
         db_table = 'tags'
+
+class Status(models.Model):
+    oerder = models.ForeignKey('Order',on_delete=models.CASCADE)
+    result = models.CharField(max_length=30)
+
+    class Meta:
+        db_table = 'statuses'
