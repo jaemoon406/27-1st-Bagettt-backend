@@ -32,7 +32,7 @@ class Category(models.Model):
 
 class PackageImage(models.Model):
     image_url = models.CharField(max_length=2000)
-    packages  = models.ForeignKey('Package')
+    packages  = models.ForeignKey('Package',on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'package_images'
@@ -42,7 +42,7 @@ class Cart(models.Model):
     package      = models.ForeignKey('Package',on_delete=models.CASCADE)
     user         = models.ForeignKey('User',on_delete=models.CASCADE)
     created_at   = models.DateTimeField(auto_now_add=True)
-    updated_at   = models.DateTimeField(auto_add=True)
+    updated_at   = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'carts'
@@ -58,10 +58,10 @@ class OrderItem(models.Model):
 
 class Order(models.Model):
     order_number = models.CharField(max_length=100)
-    sub_total    = models.IntegerField()
+    sub_total    = models.DecimalField(max_digits=9,decimal_places=2)
     user         = models.ForeignKey('User',on_delete=models.CASCADE)
     created_at   = models.DateTimeField(auto_now_add=True)
-    updated_at   = models.DateTimeField(auto_add=True)
+    updated_at   = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'orders'
@@ -72,18 +72,20 @@ class User(models.Model):
     email        = models.CharField(max_length=200,unique=True)
     password     = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=30)
+    created_at   = models.DateTimeField(auto_now_add=True)
+    updated_at   = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'users'
 
 class Tag(models.Model):
-    description = models.CharField(max_length=100)
+    name = models.CharField(max_length=20)
 
     class Meta:
         db_table = 'tags'
 
 class Status(models.Model):
-    oerder = models.ForeignKey('Order',on_delete=models.CASCADE)
+    order  = models.ForeignKey('Order',on_delete=models.CASCADE)
     result = models.CharField(max_length=30)
 
     class Meta:
