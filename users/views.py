@@ -1,28 +1,46 @@
-import json, re
+import json, bcrypt
+from json.decoder           import JSONDecodeError
 
-from django.http  import JsonResponse
-from django.views import View
+from django.http            import JsonResponse
+from django.views           import View
+from django.core.exceptions import  ValidationError
 
-from users.models import User
+from users.models           import User
+from .validaitor            import email_regex_match, password_regex_match
 
-class SignupView(View):
-    def post(self,request):
+class SignUpView(View):
+    def post(self, request):
         try:
-            data = json.loads(request.body)
-            email_regex    = r'^[a-zA-Z0-9.-_]+\@[a-zA-Z0-9.-]+\.[a-zA-Z]+$'
-            password_regex = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}'
-
-            if not re.match(email_regex,data['email']):
-                return JsonResponse({'message':'INVALID_EMAIL'}, status=201)
-            if not re.match(password_regex,data['password']):
-                return JsonResponse({'message':'INVALID_PASSWORD'}, status=201)
+            data          = json.loads(request.body)
+            name          = data['name']
+            address       = data['address']
+            email         = data['email']
+            password      = data['password']
+            phone_number  = data['phone_number']
+            
+            print(email_regex_match(email))
+            print(password_regex_match(password))
+            
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({'message':'EMAIL_ALREADY_EXISTS'}, status = 401)
+            
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
+            
             User.objects.create(
-                email     = data['email'],
-                password  = data['password'],
-                name      = data['name'],
-                address   = data['address'],
-                phone_number = data['phone_number']
-                    )
-            return JsonResponse({'message':'Congratulation'}, status=201)
-        except: 
-            return JsonResponse({'message':'ACCOUNT_EXISTS'})
+                name          = name,
+                address       = address,
+                email         = email,
+                password      = hashed_password,
+                phone_number  = phone_number
+            )
+
+            return JsonResponse({'message' : 'SUCCESS'}, status=201) 
+        
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
+        
+        except ValidationError as e:
+            return JsonResponse({'message':e.message}, status=401)
+
+        except JSONDecodeError:
+            return JsonResponse({'message':'JSON_INVALID'})
