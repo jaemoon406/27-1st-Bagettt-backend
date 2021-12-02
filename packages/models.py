@@ -1,4 +1,5 @@
-from django.db import models
+from django.db      import models
+
 
 class Package(models.Model):
     name           = models.CharField(max_length=100)
@@ -43,9 +44,3 @@ class Tag(models.Model):
     class Meta:
         db_table = 'tags'
 
-class Status(models.Model):
-    order  = models.ForeignKey('shops.Order',on_delete=models.CASCADE)
-    result = models.CharField(max_length=30)
-
-    class Meta:
-        db_table = 'statuses'
