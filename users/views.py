@@ -1,33 +1,28 @@
-import json
+import json, bcrypt, jwt
+from json.decoder import JSONDecodeError
 
-from django.http import JsonResponse
+from django.http  import JsonResponse
 from django.views import View
 
+from my_settings  import ALGORITHM, SECRET_KEY
 from users.models import User
 
 class SignInView(View):
     def post(self,request):
         try:
-            data = json.loads(request.body)
-            
-            user = User.objects.get(data=['email'])
-            if not user:
-                return JsonResponse({'message':'INVAILD_USER'},status=401)
-            data['password'] == 
+            data  = json.loads(request.body)
+            user  = User.objects.get(email=data['email'])
+
+            if bcrypt.checkpw(data['password'].encode('utf-8'),user.password.encode('utf-8')):
+                token = jwt.encode({'id':user.id},SECRET_KEY,ALGORITHM)
+                return JsonResponse({'token':token},status=201)
+            return JsonResponse({'message':'SUCCESS'}, status=400)
         
-        except:
+        except User.DoesNotExist:
+            return JsonResponse({'message':'EMAIL_ERROR'},status=401)
+        
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'},status=401)
 
-
-
-'''
-로그인 과정
-1. 아이디 받기
-2. 비번 받기
-3. 로그인 하기 
-    변수
-    - 아이다가 안 맞을 때
-    - 비번이 안 맞을 때(암호화)
-    
-    에러 아이디 공백
-        비번 공백
-'''
+        except JSONDecodeError:
+            return JsonResponse({'message':'INVAILD_ERROR'},status=404)

@@ -20,7 +20,6 @@ class OrderItem(TimeStampModel):
     quantity   = models.IntegerField()
     package    = models.ForeignKey('packages.Package',on_delete=models.CASCADE)
     order      = models.ForeignKey('shops.Order',on_delete=models.CASCADE)
- 
 
     class Meta:
         db_table = 'order_items'
