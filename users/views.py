@@ -1,6 +1,6 @@
 import json, bcrypt
-from json.decoder           import JSONDecodeError
 
+from json.decoder           import JSONDecodeError
 from django.http            import JsonResponse
 from django.views           import View
 from django.core.exceptions import  ValidationError
