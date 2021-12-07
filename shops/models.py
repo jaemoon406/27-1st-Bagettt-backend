@@ -1,4 +1,4 @@
-from os import PRIO_PROCESS
+
 from django.db                      import models
 from core.models                    import TimeStampModel
 
@@ -13,7 +13,7 @@ class Cart(TimeStampModel):
         db_table = 'carts'
 
 class Option(models.Model):
-    shipping_option = models.IntegerField(null=True)
+    shipping_option = models.CharField(max_length=20)
 
     class Meta:
         db_table = 'options'
