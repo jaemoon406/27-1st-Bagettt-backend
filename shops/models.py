@@ -3,7 +3,7 @@ from django.db                      import models
 from core.models                    import TimeStampModel
 
 class Cart(TimeStampModel):
-    quantity        = models.IntegerField()
+    quantity        = models.IntegerField(default=0)
     package         = models.ForeignKey('packages.Package',on_delete=models.CASCADE)
     user            = models.ForeignKey('users.User',on_delete=models.CASCADE)
     shipping_option = models.ForeignKey('Option',on_delete=models.CASCADE)
@@ -19,7 +19,7 @@ class Option(models.Model):
         db_table = 'options'
 
 class OrderItem(TimeStampModel):
-    quantity   = models.IntegerField()
+    quantity   = models.IntegerField(default=0)
     package    = models.ForeignKey('packages.Package',on_delete=models.CASCADE)
     order      = models.ForeignKey('shops.Order',on_delete=models.CASCADE)
 
