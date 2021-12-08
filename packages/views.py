@@ -14,7 +14,7 @@ class PackagesListView(View):
         q = Q()
 
         if brand:
-            q &= Q(products__brand_name__in=brand)
+            q &= Q(products__brand_name__in = brand)
             
         packages = Package.objects.filter(q).order_by(ordering).distinct()
         
@@ -31,7 +31,7 @@ class PackagesListView(View):
 class ProductsView(View):
     def get(self, request, package_id):
         try:
-            products = Product.objects.filter(packages__id=package_id)
+            products = Product.objects.filter(packages__id = package_id)
             package = Package.objects.get(id = package_id)
             
             result = [{
