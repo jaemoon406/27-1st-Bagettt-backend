@@ -8,9 +8,9 @@ from users.models import User
 def decorator(func):
     def wrapper(self,request,*args,**kargs):
         try:
-            token = request.headers.get('Authorization',None)
-            payload      = jwt.decode(token,SECRET_KEY,algorithms=ALGORITHM)
-            user         = User.objects.get(id=payload['id'])
+            token = request.headers.get('Authorization', None)
+            payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
+            user         = User.objects.get(id = payload['id'])
             request.user = user
         
         except jwt.exceptions.DecodeError:

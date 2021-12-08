@@ -7,7 +7,7 @@ from django.core.exceptions import  ValidationError
 
 from my_settings            import ALGORITHM, SECRET_KEY
 from users.models           import User
-from .validaitor            import email_regex_match, password_regex_match
+from core.utils.validator   import email_regex_match, password_regex_match
 
 class SignInView(View):
     def post(self,request):
