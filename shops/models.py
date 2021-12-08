@@ -29,7 +29,7 @@ class OrderItem(TimeStampModel):
 
 class Order(TimeStampModel):
     order_number    = models.CharField(max_length=100)
-    sub_total       = models.DecimalField(max_digits=9,decimal_places=2)
+    sub_total       = models.DecimalField(max_digits=9,decimal_places=2,null=True)
     user            = models.ForeignKey('users.User',on_delete=models.CASCADE)
 
     class Meta:
