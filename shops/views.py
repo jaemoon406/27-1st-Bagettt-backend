@@ -26,16 +26,17 @@ class CartView(View):
             option          = Option.objects.get(shipping_option=shipping_option).id 
             
             if int(quantity) < 1 :
-                return JsonResponse({'message':'DESELECTED_QUANTITY'}, status=400)
+                return JsonResponse({'message':'DESELECTED_QUANTITY'}, status = 400)
             
             cart, created = Cart.objects.get_or_create(
-                    user            = user,
-                    package_id      = package_id,
-                    defaults={
-                            'quantity': quantity,
-                            'price'   : price,
-                            'shipping_option_id':option}
-                    )
+                user            = user,
+                package_id      = package_id,
+                defaults        = {
+                    'quantity'           : quantity,
+                    'price'              : price,
+                    'shipping_option_id' : option
+                }
+            )
 
             cart.quantity += quantity
             cart.price    += price
@@ -47,27 +48,27 @@ class CartView(View):
             return JsonResponse({'message':e.message}, status = 400)
 
         except KeyError:
-            return JsonResponse({'message':'KEY_ERROR'}, status=400)
-    
+            return JsonResponse({'message':'KEY_ERROR'}, status = 400)
+
     @decorator
     def get(self, request):
         try:
             user        = request.user
             carts       = Cart.objects.filter(user = user.id)
-            total       = carts.values('price')
-            total_price = total.aggregate(total_price=Sum('price'))
+            total_price = carts.values('price').aggregate(total_price=Sum('price'))
             
             result=[{
                 'total_price' : total_price,
-                'cart'        :[{
+                'cart'        : [{
                     'id'        : cart.id,
                     'image'     : cart.package.thumbnail_image, 
                     'name'      : cart.package.name, 
                     'price'     : cart.price,
                     'quantity'  : cart.quantity,
                     'option'    : cart.shipping_option.shipping_option 
-                    } for cart in carts],
-                }]
+                } for cart in carts]
+            }]
+
             return JsonResponse({'result':result}, status = 200)
 
         except ValidationError as e:
@@ -97,8 +98,8 @@ class CartView(View):
             if int(quantity) < 1:
                 return JsonResponse({'messages':'DESELECTED_QUANTITY'}, status = 400)
 
-            cart          = Cart.objects.get(id=id)
-            price         = cart.package.price
+            cart  = Cart.objects.get(id=id)
+            price = cart.package.price
             
             cart.quantity = quantity
             cart.price    = Decimal(int(cart.quantity) * int(price))
