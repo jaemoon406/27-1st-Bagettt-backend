@@ -1,7 +1,6 @@
 from django.http                import JsonResponse
 from django.views               import View
 from django.db.models           import Q
-
 from packages.models            import Package, Product
 
 
