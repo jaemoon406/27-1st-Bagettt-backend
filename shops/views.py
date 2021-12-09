@@ -132,7 +132,6 @@ class OrderView(View):
             Cart.objects.filter(id__in=cart_ids, user_id=user.id).delete()
 
         new_order = Order.objects.all().order_by('-created_at').first()
-        print(new_order)
 
         result = {
             'user_name'     : user.name,
