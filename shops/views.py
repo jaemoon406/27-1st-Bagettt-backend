@@ -1,4 +1,4 @@
-import json
+import uuid, datetime, json
 
 from decimal                        import Decimal
 from django.core.checks             import messages
@@ -6,8 +6,9 @@ from django.core.exceptions         import ValidationError
 from django.db.models               import Sum
 from django.http                    import JsonResponse
 from django.views                   import View
+from django.db                      import transaction
 
-from shops.models                   import Cart, Option
+from shops.models                   import Cart, Option, Order, OrderItem
 from packages.models                import Package
 from users.models                   import User
 from core.utils.decorator           import decorator
@@ -32,16 +33,13 @@ class CartView(View):
                 user            = user,
                 package_id      = package_id,
                 defaults        = {
-                    'quantity'           : quantity,
-                    'price'              : price,
                     'shipping_option_id' : option
                 }
             )
-
             cart.quantity += quantity
             cart.price    += price
             cart.save()
-                
+            
             return JsonResponse({'result':'ADD_CART'}, status = 201)
         
         except ValidationError as e:
@@ -109,4 +107,48 @@ class CartView(View):
         
         except ValidationError as e:
             return JsonResponse({'message':e.message}, status = 401)
+
+class OrderView(View):
+    @decorator
+    def post(self,request):
+        data         = json.loads(request.body)
+        user         = request.user 
+        cart_ids     = data['cart_id']
+
+        with transaction.atomic():
+            order = Order.objects.create(order_number = uuid.uuid4(), user_id = user.id)
+            
+            OrderItem.objects.bulk_create([
+                OrderItem(
+                    quantity           = cart.quantity,
+                    order_id           = order.id,
+                    shipping_option_id = cart.shipping_option_id,
+                    package_id         = cart.package.id
+                ) for cart in Cart.objects.filter(id__in=cart_ids, user_id=user.id)
+            ])
            
+            order.sub_total = Cart.objects.filter(id__in=cart_ids).aggregate(sub_total=Sum('price'))['sub_total']
+            order.save()
+            Cart.objects.filter(id__in=cart_ids, user_id=user.id).delete()
+
+        new_order = Order.objects.all().order_by('-created_at').first()
+        print(new_order)
+
+        result = {
+            'user_name'     : user.name,
+            'address'       : user.address,
+            'phone_number'  : user.phone_number,
+            'email'         : user.email,
+            'order_number'  : order.order_number,
+            'date'          : datetime.datetime.date(order.created_at),
+            'total_price'   : order.sub_total,
+            'package'       : [{
+                'option'        : order_item.shipping_option_id,
+                'package_name'  : order_item.package.name,
+                'package_price' : order_item.package.price * order_item.quantity,
+                'quantity'      : order_item.quantity,
+                'package_image' : order_item.package.thumbnail_image
+            } for order_item in OrderItem.objects.filter(order_id=new_order.id)]
+        }
+        
+        return JsonResponse({'result':result})
