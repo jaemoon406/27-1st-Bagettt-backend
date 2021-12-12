@@ -3,7 +3,8 @@ import json, bcrypt, jwt
 from json.decoder           import JSONDecodeError
 from django.http            import JsonResponse
 from django.views           import View
-from django.core.exceptions import  ValidationError
+from django.core.exceptions import ValidationError
+
 
 from my_settings            import ALGORITHM, SECRET_KEY
 from users.models           import User
@@ -16,18 +17,19 @@ class SignInView(View):
             user  = User.objects.get(email=data['email'])
 
             if bcrypt.checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
-                token = jwt.encode({'id':user.id},SECRET_KEY,ALGORITHM)
-                return JsonResponse({'message':'SUCCESS', 'token':token}, status=201)
-            return JsonResponse({'message':'PASSWORD_ERROR'},status=401)
+                token = jwt.encode({'id' : user.id}, SECRET_KEY, ALGORITHM)
+                
+                return JsonResponse({'message' : 'SUCCESS', 'token' : token}, status=201)
+            return JsonResponse({'message' : 'UNAUTHORIZED'},status = 401)
         
         except User.DoesNotExist:
-            return JsonResponse({'message':'EMAIL_ERROR'},status=401)
+            return JsonResponse({'message' : 'INVALID_USER'}, status = 401)
         
         except KeyError:
-            return JsonResponse({'message':'KEY_ERROR'},status=401)
+            return JsonResponse({'message' : 'KEY_ERROR'}, status = 401)
 
         except JSONDecodeError:
-            return JsonResponse({'message':'INVAILD_ERROR'},status=404)
+            return JsonResponse({'message' : 'INVAILD_ERROR'}, status = 404)
 
 class SignUpView(View):
     def post(self, request):
@@ -43,7 +45,7 @@ class SignUpView(View):
             password_regex_match(password)
             
             if User.objects.filter(email=email).exists():
-                return JsonResponse({'message':'EMAIL_ALREADY_EXISTS'}, status = 400)
+                return JsonResponse({'message':'USER_ALREADY_EXISTS'}, status = 400)
             
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
