@@ -12,9 +12,10 @@
   이재문 : ERD/Modeling, LogIn & SignUpView(인가 Decorator, 값 검증 Validator), OrderView
 
 ## 협업 도구
-- slack
+- Slack
 - Github
 - Trello
+- Notion
 
 ## 적용 기술
 Python, Django, MySQL, Bcrypt, JWT, AWS(EC2, RDS, Git)
@@ -22,7 +23,7 @@ Python, Django, MySQL, Bcrypt, JWT, AWS(EC2, RDS, Git)
 ## 구현 기능
 
 ### User
-- sign-up : 정규표현식을 사용한 email, password 검증 validator
+- Sign-Up : 정규표현식을 사용한 email, password 검증 validator
 - bcrypt : 비밀번호 암호화
 - 로그인시 JWT 토큰 발행 및 토큰 검사
 
@@ -35,7 +36,7 @@ Python, Django, MySQL, Bcrypt, JWT, AWS(EC2, RDS, Git)
 
 ### Order
 - 주문 완료 내역 출력
-- cart와 주문 완료된 제품 사이의 ACID 수행을 위한 transaction 
+- 장바구니와 주문 완료된 제품 사이의 ACID 수행을 위한 Transaction 기능 활용
 
 ## ERD
 <img width="1018" alt="스크린샷 2021-12-12 오후 1.44.50.png" src="./src/database.png">
