@@ -1,5 +1,5 @@
 from django.db                      import models
-from core.models                    import TimeStampModel
+from models                    import TimeStampModel
 
 
 class Cart(TimeStampModel):
