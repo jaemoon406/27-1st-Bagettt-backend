@@ -1,4 +1,7 @@
-import uuid, datetime, json
+import pprint
+import uuid
+import datetime
+import json
 
 from decimal import Decimal
 from django.core.exceptions import ValidationError
@@ -8,7 +11,7 @@ from django.views import View
 from django.db import transaction
 
 from shops.models import Cart, Option, Order, OrderItem
-from utils.decorator import jwtdecorator
+from utils.permission import jwtdecorator
 
 
 class CartView(View):
@@ -44,10 +47,11 @@ class CartView(View):
 
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
-
+    import pprint
     @jwtdecorator
     def get(self, request):
         try:
+            pprint.pprint(request)
             user = request.user
             carts = Cart.objects.filter(user=user.id)
             total_price = carts.values('price').aggregate(total_price=Sum('price'))
@@ -88,12 +92,11 @@ class CartView(View):
         try:
             data = json.loads(request.body)
             quantity = data['quantity']
-            id = data['id']
 
             if int(quantity) < 1:
                 return JsonResponse({'messages': 'DESELECTED_QUANTITY'}, status=400)
 
-            cart = Cart.objects.get(id=id)
+            cart = Cart.objects.get(id=data['id'])
             price = cart.package.price
 
             cart.quantity = quantity
@@ -109,8 +112,8 @@ class CartView(View):
 class OrderView(View):
     @jwtdecorator
     def post(self, request):
-        data = json.loads(request.body)
         user = request.user
+        data = json.loads(request.body)
         cart_ids = data['cart_id']
 
         with transaction.atomic():
@@ -149,3 +152,11 @@ class OrderView(View):
         }
 
         return JsonResponse({'result': result})
+'''
+리팩토링 계획
+현재 post 메소드와 동시에 result에 주문완료 상품 응답
+이유 : 최근 주문 목록을 가져오기에 확실한 기준 없음(new_order로 기준을 만듬)
+문제 : 새로고침을 하면 결과값 볼 수 없음
+해결방안 : result는 get 메소드로 만들고, post에서 성공메시지와 주문번호 응답
+           주문번호로 order테이블에서 구분 후 응답 예정
+'''

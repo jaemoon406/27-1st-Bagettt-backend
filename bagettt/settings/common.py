@@ -95,7 +95,18 @@ DATABASES = {
         'OPTIONS': {'charset': 'utf8mb4'}
     }
 }
-
+# AWS
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'mysql-db.cyttf9g2djkc.ap-northeast-2.rds.amazonaws.com',
+#         'NAME': 'bagettt',
+#         'USER': os.environ['USER'],
+#         'PASSWORD': os.environ['PASSWORD'],
+#         'HOST': '127.0.0.1',
+#         'PORT': os.environ['PORT'],
+#         'OPTIONS': {'charset': 'utf8mb4'}
+#     }
+# }
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
